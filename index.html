@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Acesso - Free Fire System</title>
+    <meta name="description" content="Sistema de Auxilio de Mira Premium FreeFire">
+    <meta name="theme-color" content="#ff0080">
+
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Spotify">
+  <script src="protection.js?v=5.0"></script>
+    <link rel="stylesheet" href="assets/css/style.css?v=228.0">
+    <link rel="stylesheet" href="assets/css/support.css?v=1.3">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ============================
+           STORE MODAL — Wrapper
+        ============================ */
+        .store-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9000;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .store-modal.open { display: block; }
+
+        .store-modal-bg {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(3px);
+        }
+
+        .store-modal-wrap {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .store-close-btn {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            z-index: 9100;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(18, 0, 22, 0.95);
+            border: 2px solid #ff0080;
+            color: #ff0080;
+            font-size: 17px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            transition: background .15s, transform .1s;
+        }
+        .store-close-btn:hover {
+            background: rgba(255, 0, 128, 0.15);
+            transform: scale(1.08);
+        }
+
+        /* ============================
+           STORE LANDING (lista de produtos)
+        ============================ */
+        #landingView {
+            width: 100%;
+            max-width: 480px;
+            background: #120016;
+            min-height: 100vh;
+            padding: 56px 0 48px;
+            font-family: system-ui, -apple-system, sans-serif;
+            color: #fff;
+        }
+        #landingView.hidden { display: none !important; }
+
+        .sloja-section-title {
+            text-align: center;
+            font-size: 13px;
+            font-weight: 700;
+            margin: 0 16px 8px;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            color: #fff;
+        }
+
+        .sloja-arrow {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 14px;
+            color: #ffdf00;
+        }
+
+        .sloja-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 0 16px;
+        }
+
+        .sloja-btn {
+            border-radius: 999px;
+            padding: 14px 18px;
+            font-size: 14px;
+            font-weight: 700;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            color: #000;
+            box-shadow: 0 0 18px #ff00ff66;
+            transition: transform .1s ease, filter .1s ease;
+            width: 100%;
+            text-align: left;
+        }
+        .sloja-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.08);
+        }
+
+        .sloja-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .sloja-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Evita que body.checkout-mode quebre o layout da página principal */
+        body.checkout-mode {
+            background: #1a0022 !important;
+            display: flex !important;
+            justify-content: center !important;
+        }
+
+        /* ============================
+           LOJA Landing — estilos completos
+           (replicados de LOJA/index.php)
+        ============================ */
+        #landingView {
+            padding: 0 !important; /* remove padding antigo; cover vai do topo */
+        }
+
+        #storeModal #landingView .loja-page {
+            width: 100%;
+            max-width: 480px;
+            padding-bottom: 40px;
+            background: #120016;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: #fff;
+        }
+
+        #storeModal #landingView .loja-cover {
+            position: relative;
+            height: 220px;
+            overflow: hidden;
+        }
+
+        #storeModal #landingView .loja-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.1);
+        }
+
+        #storeModal #landingView .loja-cover::after {
+            content: "";
+            position: absolute;
+            left: 0; right: 0; bottom: 0;
+            height: 140px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, #120016 80%, #120016 100%);
+            pointer-events: none;
+        }
+
+        #storeModal #landingView .loja-content {
+            border-radius: 0 0 32px 32px;
+            padding-bottom: 40px;
+            padding-top: 70px;
+            margin-top: -80px;
+        }
+
+        #storeModal #landingView .loja-profile-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-top: -40px;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 2;
+        }
+
+        #storeModal #landingView .loja-profile {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid #ff00ff;
+            box-shadow: 0 0 20px #ff00ff88;
+            background: #000;
+        }
+
+        #storeModal #landingView .loja-profile img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #storeModal #landingView .loja-name {
+            text-align: center;
+            font-weight: 700;
+            font-size: 20px;
+            color: #fff;
+        }
+
+        #storeModal #landingView .loja-description {
+            text-align: center;
+            font-size: 14px;
+            color: #dddddd;
+            margin-top: 4px;
+            padding: 0 16px;
+            line-height: 1.5;
+        }
+
+        #storeModal #landingView .loja-socials {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        #storeModal #landingView .loja-social-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #111;
+            border: 1px solid #ff00ff66;
+            cursor: pointer;
+            text-decoration: none;
+            color: #fff;
+            font-size: 18px;
+            overflow: hidden;
+        }
+
+        #storeModal #landingView .loja-social-icon.has-image {
+            background: transparent;
+        }
+
+        #storeModal #landingView .loja-social-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        #storeModal #landingView .loja-section-title {
+            text-align: center;
+            margin: 24px 16px 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        #storeModal #landingView .loja-arrow-line {
+            text-align: center;
+            font-size: 18px;
+            color: #ffdf00;
+            margin-bottom: 12px;
+        }
+
+        #storeModal #landingView .loja-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 0 16px;
+        }
+
+        #storeModal #landingView .loja-btn-main {
+            border-radius: 999px;
+            padding: 14px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            color: white !important;
+            box-shadow: 0 0 18px #ff00ff66;
+            transition: transform .1s ease, box-shadow .1s ease, filter .1s ease;
+            width: 100%;
+            text-align: left;
+        }
+
+        #storeModal #landingView .loja-btn-main:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+            box-shadow: 0 0 25px #ff00ffaa;
+        }
+
+        #storeModal #landingView .loja-btn-main .loja-icon-circle {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        #storeModal #landingView .loja-btn-main .loja-icon-circle.has-image {
+            background: transparent;
+        }
+
+        #storeModal #landingView .loja-btn-main .loja-icon-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Banner de Instalação PWA -->
+    <div id="pwa-install-banner" class="pwa-banner" style="display: none;">
+            <div class="pwa-banner-content">
+                <div class="pwa-banner-icon">📱</div>
+                <div class="pwa-banner-text">
+                    <strong>Instalar App</strong>
+                    <span>Adicione à tela inicial para acesso rápido</span>
+                </div>
+                <button id="pwa-install-btn" class="pwa-install-btn">INSTALAR</button>
+                <button id="pwa-dismiss-btn" class="pwa-dismiss-btn">✕</button>
+            </div>
+            <!-- Instruções iOS (aparece quando expandido) -->
+            <div id="pwa-ios-instructions" class="pwa-ios-instructions" style="display: none;">
+                <div class="ios-steps">
+                    <div class="ios-step">
+                        <div class="step-number">1</div>
+                        <div class="step-text">O perfil de configuração foi baixado. Toque em <strong>"Permitir"</strong> se aparecer um aviso</div>
+                    </div>
+                    <div class="ios-step">
+                        <div class="step-number">2</div>
+                        <div class="step-text">Vá em <strong>Configurações</strong> → <strong>Perfil Baixado</strong> (ou <strong>Geral</strong> → <strong>Gerenciamento de Perfis</strong>)</div>
+                    </div>
+                    <div class="ios-step">
+                        <div class="step-number">3</div>
+                        <div class="step-text">Toque em <strong>"PavaniSensi - Instalação"</strong> e depois em <strong>"Instalar"</strong></div>
+                    </div>
+                    <div class="ios-step">
+                        <div class="step-number">4</div>
+                        <div class="step-text">Digite seu código de acesso e toque em <strong>"Instalar"</strong> novamente</div>
+                    </div>
+                    <div class="ios-step" style="background: rgba(255, 0, 128, 0.2); border-left-color: #ff0080;">
+                        <div class="step-number" style="background: #ff0080; color: #fff;">✓</div>
+                        <div class="step-text"><strong>Pronto!</strong> O app será adicionado à sua tela inicial automaticamente</div>
+                    </div>
+                </div>
+                <button id="pwa-ios-close" class="pwa-ios-close-btn">ENTENDI</button>
+            </div>
+        </div>
+    
+    <div class="container">
+        <div class="login-box">
+            <div class="login-header">
+                <div class="icon" id="login-icon"></div>
+                <h1>Sistema de Auxilio de Mira Premium.</h1>
+            </div>
+            
+                        
+            <form action="dashboard.php" method="POST" class="login-form" id="login-form">
+                <input type="hidden" name="fingerprint" id="device-fingerprint" value="">
+                <div class="input-group">
+                    <label for="key">DIGITE SUA KEY DE ACESSO:</label>
+                    <input type="text" id="key" name="key" placeholder="SUA KEY DE ACESSO" required autofocus>
+                </div>
+                
+                <button type="submit" class="btn-primary" id="submit-btn">VALIDAR ACESSO</button>
+            </form>
+            <br><center><span>NÃO TEM ACESSO ?</span></center>
+            <button type="button" class="btn-secondary" id="acquire-btn" onclick="openStoreModal()">
+                GARANTIR MEU ACESSO!
+            </button>
+            <a href="reset_access.php" target="_blank" class="btn-secondary" style="background: rgba(255, 100, 50, 0.2); border: 2px solid rgba(255, 100, 50, 0.5);">
+                🔐 RESETAR ACESSO
+            </a>
+            <a href="validate_purchase.php" class="btn-secondary" style="background: rgba(0, 255, 150, 0.15); border: 2px solid rgba(0, 255, 150, 0.7);display:none!important">
+                ✅ VALIDAR COMPRA
+            </a>
+            <div class="security-warning">
+                <div class="security-icon">🔒</div>
+                <div class="security-text">
+                    <strong>Único site oficial auxilio.pavanisensi.online</strong>
+                    <span>Cuidado com cópias falsas</span>
+                </div>
+            </div>
+            
+            <div class="login-footer">
+                <div class="footer-info">
+                    <p class="footer-text">Todos os direitos reservados</p>
+                    <p class="footer-credits">@pavanisensi</p>
+                    <p class="footer-version">Versão 1.0.0</p>
+                </div>
+                
+            </div>
+            
+            <div class="support-section">
+                <a href="https://www.tiktok.com/@pavanizzq?_r=1&_t=ZS-91woLJvthe1" target="_blank" class="support-btn tiktok-btn">
+                    <span class="support-icon" id="tiktok-icon"></span>
+                    <span class="support-text">TikTok</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <!-- ====================================================
+         LOJA MODAL — aparece ao clicar em ADQUIRIR ACESSO
+    ==================================================== -->
+    <div id="storeModal" class="store-modal" aria-hidden="true">
+        <div class="store-modal-bg" id="storeModalBg"></div>
+        <div class="store-modal-wrap">
+            <button class="store-close-btn" id="storeCloseBtn" aria-label="Fechar loja" title="Fechar">✕</button>
+
+            <!-- Landing: réplica fiel da LOJA/index.php com dados do banco -->
+            <div id="landingView">
+                <div class="loja-page">
+
+                                        <div class="loja-cover">
+                        <img src="LOJA/assets/cover_1784909683.jpeg" alt="Capa">
+                    </div>
+                    
+                    <div class="loja-content">
+
+                                                <div class="loja-profile-wrapper">
+                            <div class="loja-profile">
+                                <img src="LOJA/assets/profile_1780345037.jpeg" alt="Foto de perfil">
+                            </div>
+                        </div>
+                        
+                                                <div class="loja-name">pavanixiter</div>
+                        
+                                                <div class="loja-description">O que você procura, você encontra aqui.</div>
+                        
+                                                <div class="loja-socials">
+                                                        <a class="loja-social-icon has-image"
+                               href="https://www.tiktok.com/@pavanizqq?_r=1&amp;_t=ZS-98JLiA5o7nN"
+                               target="_blank" rel="noopener noreferrer">
+                                                                    <img src="LOJA/assets/social/social_1773795897_8003.png" alt="Rede social">
+                                                            </a>
+                                                        <a class="loja-social-icon has-image"
+                               href="https://www.instagram.com/pavanixiter?igsh=azF2dTFvejhpMDg3&amp;utm_source=qr"
+                               target="_blank" rel="noopener noreferrer">
+                                                                    <img src="LOJA/assets/social/social_1773795857_8472.png" alt="Rede social">
+                                                            </a>
+                                                    </div>
+                        
+                        <div class="loja-section-title">
+                            PEGA EM ANDROID E IPHONE ✅<br>NÃO PRECISA DE GBOX ✅<br>NÃO PRECISA DE PC ✅<br>INSTALAÇÃO RÁPIDA ✅<br>ACESSO PERMANENTE ✅                        </div>
+                        <div class="loja-arrow-line">👇👇👇</div>
+
+                        <div class="loja-buttons">
+                                                        <button type="button"
+                                class="loja-btn-main btn-product-checkout"
+                                data-button-id="1"                                style="background:#ff00ff">
+                                <span class="loja-icon-circle has-image">
+                                                                            <img src="LOJA/assets/icons/icon_1773795352_8172.png" alt="">
+                                                                    </span>
+                                <span>INJETOR DE XIT IPHONE</span>
+                            </button>
+                                                        <button type="button"
+                                class="loja-btn-main btn-product-checkout"
+                                data-button-id="2"                                style="background:#ff00ff">
+                                <span class="loja-icon-circle has-image">
+                                                                            <img src="LOJA/assets/icons/icon_1773795467_5793.png" alt="">
+                                                                    </span>
+                                <span>INJETOR DE XIT ANDROID</span>
+                            </button>
+                                                                                </div>
+
+                    </div><!-- /.loja-content -->
+                </div><!-- /.loja-page -->
+            </div><!-- /#landingView -->
+
+                    <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <style>
+            body.checkout-mode {
+                font-family: 'Inter', system-ui, -apple-system, sans-serif;
+                background: #eef2f4;
+                color: #334155;
+                display: block;
+                justify-content: initial;
+            }
+        
+            #checkoutView { display: none; }
+            #checkoutView.active { display: block; }
+            #landingView.hidden { display: none; }
+        
+            #checkoutView * { box-sizing: border-box; }
+        
+            .checkout-wrap {
+                max-width: 480px;
+                margin: 0 auto;
+                min-height: 100vh;
+                background: #fff;
+                box-shadow: 0 0 40px rgba(0,0,0,.06);
+                overflow: hidden;
+            }
+        
+            .countdown-bar {
+                background: #e85d04;
+                color: #fff;
+                padding: 10px 12px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+        
+            .countdown-left {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                flex: 1;
+                min-width: 0;
+            }
+        
+            .countdown-left svg { flex-shrink: 0; }
+        
+            .countdown-timer {
+                display: flex;
+                gap: 4px;
+                flex-shrink: 0;
+            }
+        
+            .timer-box {
+                background: rgba(0,0,0,.15);
+                border: 1px solid rgba(255,255,255,.35);
+                border-radius: 4px;
+                padding: 4px 6px;
+                text-align: center;
+                min-width: 44px;
+            }
+        
+            .timer-box .num {
+                font-size: 15px;
+                font-weight: 700;
+                line-height: 1.1;
+                display: block;
+            }
+        
+            .timer-box .lbl {
+                font-size: 8px;
+                font-weight: 500;
+                opacity: .9;
+                text-transform: uppercase;
+            }
+        
+            .video-section {
+                background: #000;
+                position: relative;
+                padding-bottom: 56.25%;
+                height: 0;
+                overflow: hidden;
+            }
+        
+            .video-section iframe {
+                position: absolute;
+                top: 0; left: 0;
+                width: 100%; height: 100%;
+                border: 0;
+            }
+        
+            .checkout-body { padding: 16px 16px 0; }
+        
+            .product-header {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 18px;
+            }
+        
+            .product-badge {
+                width: 72px;
+                height: 72px;
+                border-radius: 12px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                color: #fff;
+                font-size: 9px;
+                font-weight: 800;
+                text-align: center;
+                line-height: 1.15;
+                padding: 6px;
+                box-shadow: 0 4px 12px rgba(255,0,136,.35);
+            }
+        
+            .badge-iphone { background: linear-gradient(135deg, #ff1493, #ff69b4); }
+            .badge-android { background: linear-gradient(135deg, #ff1493, #c71585); }
+        
+            .product-badge .os-icon {
+                font-size: 22px;
+                margin-bottom: 4px;
+                line-height: 1;
+                display: block;
+            }
+        
+            .product-badge img {
+                width: 36px;
+                height: 36px;
+                object-fit: contain;
+                margin-bottom: 4px;
+            }
+        
+            .product-badge-img {
+                height: 72px;
+                width: auto;
+                max-width: 140px;
+                border-radius: 12px;
+                object-fit: contain;
+                flex-shrink: 0;
+                box-shadow: 0 4px 12px rgba(255, 0, 136, .35);
+            }
+        
+            .product-title {
+                font-size: 15px;
+                font-weight: 700;
+                color: #1e293b;
+                text-transform: uppercase;
+                line-height: 1.25;
+            }
+        
+            .field-label {
+                font-size: 14px;
+                font-weight: 600;
+                color: #334155;
+                margin-bottom: 6px;
+                display: block;
+            }
+        
+            .email-wrap { position: relative; margin-bottom: 6px; }
+        
+            .email-input {
+                width: 100%;
+                padding: 14px 14px;
+                border: 1px solid #cbd5e1;
+                border-radius: 10px;
+                font-size: 15px;
+                color: #1e293b;
+                outline: none;
+                transition: border-color .15s;
+            }
+        
+            .email-input:focus { border-color: #e85d04; }
+        
+            .email-hint {
+                font-size: 12px;
+                color: #64748b;
+                margin-bottom: 20px;
+                display: none;
+            }
+        
+            .email-hint.visible { display: block; }
+        
+            .email-suggestions {
+                display: none;
+                position: absolute;
+                left: 0; right: 0;
+                top: 100%;
+                margin-top: 4px;
+                background: #fff;
+                border: 1px solid #e2e8f0;
+                border-radius: 10px;
+                overflow: hidden;
+                z-index: 20;
+                box-shadow: 0 8px 24px rgba(0,0,0,.1);
+            }
+        
+            .email-suggestions.open { display: block; }
+        
+            .email-suggestions button {
+                display: block;
+                width: 100%;
+                padding: 11px 14px;
+                border: none;
+                background: #fff;
+                text-align: left;
+                font-size: 14px;
+                color: #334155;
+                cursor: pointer;
+            }
+        
+            .email-suggestions button:hover,
+            .email-suggestions button.active {
+                background: #00a896;
+                color: #fff;
+            }
+        
+            .section-title {
+                font-size: 15px;
+                font-weight: 700;
+                color: #1e293b;
+                margin-bottom: 8px;
+            }
+        
+            .offer-block {
+                padding-bottom: 16px;
+                margin-bottom: 16px;
+                border-bottom: 1px solid #e2e8f0;
+            }
+        
+            .offer-cash {
+                font-size: 14px;
+                color: #64748b;
+                margin-bottom: 4px;
+            }
+        
+            .offer-access {
+                font-size: 14px;
+                color: #334155;
+            }
+        
+            .offer-access strong { font-weight: 700; }
+        
+            .payment-block { margin-bottom: 16px; }
+        
+            .pix-card {
+                border: 2px solid #00a896;
+                border-radius: 10px;
+                padding: 14px;
+                width: 100px;
+                background: #fff;
+            }
+        
+            .pix-icon-img {
+                display: block;
+                width: 20px;
+                height: 20px;
+                margin-bottom: 6px;
+                object-fit: contain;
+            }
+        
+            .pix-icon-img-lg {
+                width: 36px;
+                height: 36px;
+            }
+        
+            .pix-card span {
+                font-size: 15px;
+                font-weight: 700;
+                color: #00a896;
+            }
+        
+            .receipt-wrap {
+                background: #f1f5f9;
+                margin: 0;
+                padding: 16px 16px 0;
+                width: 100%;
+                box-sizing: border-box;
+            }
+        
+            .receipt {
+                background: #f8fafc;
+                border-radius: 12px 12px 0 0;
+                padding: 16px;
+                position: relative;
+                max-width: 100%;
+            }
+        
+            .receipt-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                gap: 12px;
+                font-size: 13px;
+            }
+        
+            .receipt-row > div:first-child {
+                flex: 1;
+                min-width: 0;
+            }
+        
+            .receipt-row .name {
+                font-weight: 700;
+                color: #1e293b;
+                text-transform: uppercase;
+                font-size: 12px;
+                line-height: 1.3;
+                word-break: break-word;
+                padding-right: 8px;
+            }
+        
+            .receipt-row .sub {
+                font-size: 11px;
+                color: #94a3b8;
+                margin-top: 2px;
+            }
+        
+            .receipt-row .price { font-weight: 600; color: #334155; white-space: nowrap; }
+        
+            .receipt-divider {
+                height: 1px;
+                background: #e2e8f0;
+                margin: 12px 0;
+            }
+        
+            .receipt-total {
+                display: flex;
+                justify-content: space-between;
+                font-weight: 700;
+                font-size: 14px;
+                color: #1e293b;
+            }
+        
+            .receipt-zigzag {
+                height: 12px;
+                width: 100%;
+                background:
+                    linear-gradient(135deg, #f8fafc 6px, transparent 0) 0 0,
+                    linear-gradient(-135deg, #f8fafc 6px, transparent 0) 0 0;
+                background-size: 12px 12px;
+                background-color: #f1f5f9;
+                margin-top: -1px;
+            }
+        
+            .checkout-footer {
+                padding: 16px;
+                background: #fff;
+            }
+        
+            .btn-pix {
+                width: 100%;
+                padding: 16px;
+                border: none;
+                border-radius: 12px;
+                background: #00a896;
+                color: #fff;
+                font-size: 16px;
+                font-weight: 700;
+                cursor: pointer;
+                position: relative;
+                overflow: hidden;
+                transition: opacity .15s;
+            }
+        
+            .btn-pix:disabled { opacity: .85; cursor: wait; }
+        
+            .btn-pix .progress-bar {
+                display: none;
+                position: absolute;
+                left: 0; top: 0; bottom: 0;
+                width: 0;
+                background: rgba(0,0,0,.15);
+                transition: width .3s;
+            }
+        
+            .btn-pix.loading .progress-bar { display: block; width: 18%; }
+        
+            .legal-text {
+                text-align: center;
+                font-size: 11px;
+                color: #00a896;
+                margin-top: 12px;
+                line-height: 1.5;
+            }
+        
+            .legal-text a { color: #00a896; }
+        
+            .secure-badge {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                margin-top: 14px;
+                font-size: 12px;
+                color: #94a3b8;
+                padding-bottom: 20px;
+            }
+        
+            .form-error {
+                color: #dc2626;
+                font-size: 13px;
+                margin-top: 8px;
+                display: none;
+            }
+        
+            .form-error.visible { display: block; }
+        
+            #stepPix {
+                display: none;
+                min-height: 100vh;
+                background: #eef2f4;
+                padding: 24px 16px 32px;
+            }
+        
+            #stepPix.active { display: block; }
+        
+            #stepCheckout.hidden { display: none; }
+        
+            .pix-screen {
+                max-width: 420px;
+                margin: 0 auto;
+                background: #fff;
+                border-radius: 16px;
+                padding: 28px 20px 24px;
+                box-shadow: 0 4px 24px rgba(0,0,0,.08);
+                text-align: center;
+            }
+        
+            .pix-logo-circle {
+                width: 64px;
+                height: 64px;
+                border-radius: 50%;
+                background: #fff;
+                box-shadow: 0 4px 16px rgba(0,0,0,.1);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 16px;
+            }
+        
+            .pix-screen h1 {
+                font-size: 22px;
+                font-weight: 700;
+                color: #1e293b;
+                margin-bottom: 8px;
+            }
+        
+            .pix-screen .subtitle {
+                font-size: 14px;
+                color: #64748b;
+                margin-bottom: 20px;
+                line-height: 1.45;
+            }
+        
+            .qr-box {
+                border: 1px solid #e2e8f0;
+                border-radius: 12px;
+                overflow: hidden;
+                margin-bottom: 16px;
+                text-align: left;
+            }
+        
+            .qr-box-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 14px;
+                font-size: 14px;
+                font-weight: 600;
+                color: #334155;
+            }
+        
+            .qr-box-header .expires { font-weight: 500; font-size: 13px; }
+        
+            .qr-img-wrap {
+                padding: 12px;
+                display: flex;
+                justify-content: center;
+                background: #fff;
+            }
+        
+            .qr-img-wrap img {
+                max-width: 220px;
+                width: 100%;
+                height: auto;
+                display: block;
+            }
+        
+            .qr-progress {
+                height: 4px;
+                background: #4caf50;
+                width: 100%;
+                transform-origin: left;
+                transition: transform 1s linear;
+            }
+        
+            .btn-copy-pix {
+                width: 100%;
+                padding: 15px;
+                border: none;
+                border-radius: 12px;
+                background: #00a896;
+                color: #fff;
+                font-size: 15px;
+                font-weight: 700;
+                cursor: pointer;
+            }
+        
+            .btn-copy-pix.copied { background: #059669; }
+        
+            .pix-wait-msg {
+                margin-top: 14px;
+                font-size: 12px;
+                color: #94a3b8;
+            }
+        
+            #stepSuccess {
+                display: none;
+                min-height: 100vh;
+                background: #eef2f4;
+                padding: 40px 16px;
+                text-align: center;
+            }
+        
+            #stepSuccess.active { display: block; }
+        
+            .success-card {
+                max-width: 400px;
+                margin: 0 auto;
+                background: #fff;
+                border-radius: 16px;
+                padding: 28px 20px;
+                box-shadow: 0 4px 24px rgba(0,0,0,.08);
+            }
+        
+            .success-card h2 { color: #059669; margin-bottom: 12px; }
+        
+            .success-card p { font-size: 14px; color: #64748b; margin-bottom: 20px; }
+        
+            .btn-access {
+                display: inline-block;
+                width: 100%;
+                padding: 14px;
+                border-radius: 12px;
+                background: #00a896;
+                color: #fff;
+                font-weight: 700;
+                text-decoration: none;
+            }
+        </style>
+        
+        <div id="checkoutView">
+            <div id="stepCheckout" class="checkout-wrap">
+                <div class="countdown-bar">
+                    <div class="countdown-left">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+                        </svg>
+                        <span>Oferta por tempo limitado!</span>
+                    </div>
+                    <div class="countdown-timer">
+                        <div class="timer-box"><span class="num" id="cdHours">0</span><span class="lbl">Horas</span></div>
+                        <div class="timer-box"><span class="num" id="cdMin">5</span><span class="lbl">Min</span></div>
+                        <div class="timer-box"><span class="num" id="cdSec">00</span><span class="lbl">Seg</span></div>
+                    </div>
+                </div>
+        
+                <div class="video-section">
+                    <iframe
+                        src="https://www.youtube.com/embed/tXU0jLzsRzY?rel=0"
+                        title="Como comprar"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+                </div>
+        
+                <div class="checkout-body">
+                    <div class="product-header">
+                        <div id="checkoutProductBadge"></div>
+                        <div class="product-title" id="checkoutProductTitle"></div>
+                    </div>
+        
+                    <form id="checkoutForm">
+                        <input type="hidden" name="button_id" id="checkoutButtonId" value="">
+        
+                        <label class="field-label" for="payerEmail">E-mail</label>
+                        <div class="email-wrap">
+                            <input type="text" class="email-input" id="payerEmail" name="payer_email"
+                                   autocomplete="email" placeholder="Seu melhor e-mail" required>
+                            <div class="email-suggestions" id="emailSuggestions"></div>
+                        </div>
+                        <p class="email-hint" id="emailHint" style="color:#64748b!important;display: block !important;">Este é o e-mail que você usará para acessar sua compra.</p>
+        
+                        <div class="offer-block">
+                            <div class="section-title">Oferta</div>
+                            <p class="offer-cash" id="checkoutOfferCash"></p>
+                            <p class="offer-access">Acesso <strong>vitalício</strong></p>
+                        </div>
+        
+                        <div class="payment-block">
+                            <div class="section-title">Forma de pagamento</div>
+                            <div class="pix-card">
+                                <span>Pix</span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+        
+                <div class="receipt-wrap">
+                    <div class="receipt">
+                        <div class="receipt-row">
+                            <div>
+                                <div class="name" id="checkoutReceiptName"></div>
+                                <div class="sub">Pagamento único</div>
+                            </div>
+                            <div class="price" id="checkoutReceiptPrice"></div>
+                        </div>
+                        <div class="receipt-divider"></div>
+                        <div class="receipt-total">
+                            <span>Total</span>
+                            <span id="checkoutReceiptTotal"></span>
+                        </div>
+                    </div>
+                    <div class="receipt-zigzag"></div>
+                </div>
+        
+                <div class="checkout-footer">
+                    <button type="submit" form="checkoutForm" class="btn-pix" id="btnGerarPix">
+                        <span class="progress-bar"></span>
+                        <span class="btn-label">Gerar Pix</span>
+                    </button>
+                    <p class="form-error" id="formError"></p>
+                    <p class="legal-text">
+                        Ao prosseguir você concorda com os <a href="#">Termos de uso</a> e <a href="#">Política de privacidade</a>
+                    </p>
+                    <div class="secure-badge">
+                        Compra segura
+                    </div>
+                </div>
+            </div>
+        
+            <div id="stepPix">
+                <div class="pix-screen">
+                    <div class="pix-logo-circle">
+                    </div>
+                    <h1>Pagar com Pix</h1>
+                    <p class="subtitle">Escaneie o QR Code ou copie e cole o código Pix</p>
+                    <div class="qr-box">
+                        <div class="qr-box-header">
+                            <span id="pixAmountDisplay"></span>
+                            <span class="expires" id="pixExpires">Expira em 10:00</span>
+                        </div>
+                        <div class="qr-img-wrap">
+                            <img id="pixQrImg" src="" alt="QR Code PIX">
+                        </div>
+                        <div class="qr-progress" id="qrProgress"></div>
+                    </div>
+                    <button type="button" class="btn-copy-pix" id="btnCopyPix">Copiar código pix</button>
+                    <p class="pix-wait-msg">Após pagar, aguarde alguns segundos enquanto confirmamos automaticamente.</p>
+                </div>
+            </div>
+        
+            <div id="stepSuccess">
+                <div class="success-card">
+                    <h2>Pagamento confirmado!</h2>
+                    <p id="successText">Seu acesso foi liberado. Use o mesmo e-mail da compra para entrar.</p>
+                    <a href="#" id="btnAccess" class="btn-access" target="_blank" rel="noopener">Acessar ferramenta</a>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+        (function () {
+            const PRODUCTS = {"1":{"id":1,"nome":"INJETOR DE XIT IPHONE","valorFmt":"19,99","icone":"assets\/icons\/icon_1773795352_8172.png","iconIsImage":true,"isAndroid":false,"badgeText":"AUXILIO IPHONE","badgeClass":"badge-iphone","productBadgeSrc":"LOJA\/IMG_0018.PNG","accessUrl":"https:\/\/drive.google.com\/drive\/u\/0\/mobile\/folders\/1rNrcZyH_4eP4lmpWcF637sV3OGiXo07A"},"2":{"id":2,"nome":"INJETOR DE XIT ANDROID","valorFmt":"19,99","icone":"assets\/icons\/icon_1773795467_5793.png","iconIsImage":true,"isAndroid":true,"badgeText":"AUXILIO ANDROID","badgeClass":"badge-android","productBadgeSrc":"LOJA\/IMG_0019.PNG","accessUrl":"https:\/\/drive.google.com\/drive\/u\/0\/mobile\/folders\/1rNrcZyH_4eP4lmpWcF637sV3OGiXo07A"}};
+            const AUTO_CHECKOUT_ID = 0;
+            const PIX_EXPIRY_SEC = 600;
+            const AUTO_LOGIN     = true;
+            const LOGIN_ACTION   = '';
+        
+            const landingView = document.getElementById('landingView');
+            const checkoutView = document.getElementById('checkoutView');
+            const stepCheckout = document.getElementById('stepCheckout');
+            const stepPix = document.getElementById('stepPix');
+            const stepSuccess = document.getElementById('stepSuccess');
+            const form = document.getElementById('checkoutForm');
+            const emailInput = document.getElementById('payerEmail');
+            const emailSuggestions = document.getElementById('emailSuggestions');
+            const emailHint = document.getElementById('emailHint');
+            const formError = document.getElementById('formError');
+            const btnGerarPix = document.getElementById('btnGerarPix');
+            const btnLabel = btnGerarPix.querySelector('.btn-label');
+        
+            const domains = ['gmail.com', 'hotmail.com', 'outlook.com', 'icloud.com', 'yahoo.com.br'];
+            const androidSvg = '<svg class="os-icon" width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24a6.96 6.96 0 00-5.47 0L9.12 5.67c-.18-.28-.54-.37-.83-.22-.3.16-.42.54-.26.85l1.84 3.18a6.04 6.04 0 00-2.32 8.12 5.9 5.9 0 004.58 2.17 5.9 5.9 0 004.58-2.17 6.04 6.04 0 00-2.33-8.12zM12 19.5a4.5 4.5 0 01-3.48-1.64 4.42 4.42 0 011.74-6.07 4.42 4.42 0 013.48 0 4.42 4.42 0 011.74 6.07A4.5 4.5 0 0112 19.5z"/></svg>';
+            const appleSvg = '<svg class="os-icon" width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>';
+        
+            let currentButtonId = 0;
+            let currentAccessUrl = '';
+            let currentPayerEmail = '';
+            let currentTxId = null;
+            let statusInterval = null;
+            let copyPasteCode = '';
+            let expiryTimer = null;
+            let expiryRemaining = PIX_EXPIRY_SEC;
+            let offerSeconds = 5 * 60;
+            let countdownStarted = false;
+        
+            function pad(n) { return n < 10 ? '0' + n : '' + n; }
+        
+            function escapeHtml(str) {
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;');
+            }
+        
+            function tickCountdown() {
+                const h = Math.floor(offerSeconds / 3600);
+                const m = Math.floor((offerSeconds % 3600) / 60);
+                const s = offerSeconds % 60;
+                document.getElementById('cdHours').textContent = h;
+                document.getElementById('cdMin').textContent = m;
+                document.getElementById('cdSec').textContent = pad(s);
+                if (offerSeconds > 0) offerSeconds--;
+                else offerSeconds = 5 * 60;
+            }
+        
+            function startCountdown() {
+                if (countdownStarted) return;
+                countdownStarted = true;
+                tickCountdown();
+                setInterval(tickCountdown, 1000);
+            }
+        
+            function renderProductBadge(product) {
+                const wrap = document.getElementById('checkoutProductBadge');
+                if (product.productBadgeSrc) {
+                    wrap.innerHTML = '<img src="' + escapeHtml(product.productBadgeSrc) + '" alt="" class="product-badge-img">';
+                    return;
+                }
+                let iconHtml = '';
+                if (product.iconIsImage) {
+                    iconHtml = '<img src="' + escapeHtml(product.icone) + '" alt="">';
+                } else if (product.isAndroid) {
+                    iconHtml = androidSvg;
+                } else {
+                    iconHtml = appleSvg;
+                }
+                wrap.innerHTML = '<div class="product-badge ' + escapeHtml(product.badgeClass) + '">' +
+                    iconHtml + escapeHtml(product.badgeText) + '</div>';
+            }
+        
+            function resetCheckoutSteps() {
+                stepCheckout.classList.remove('hidden');
+                stepPix.classList.remove('active');
+                stepSuccess.classList.remove('active');
+                if (statusInterval) {
+                    clearInterval(statusInterval);
+                    statusInterval = null;
+                }
+                if (expiryTimer) {
+                    clearInterval(expiryTimer);
+                    expiryTimer = null;
+                }
+                currentTxId = null;
+                copyPasteCode = '';
+                form.reset();
+                emailHint.classList.remove('visible');
+                hideError();
+                setLoading(false);
+                document.getElementById('pixQrImg').src = '';
+                const accessBtn = document.getElementById('btnAccess');
+                accessBtn.style.display = '';
+                accessBtn.href = '#';
+            }
+        
+            function openCheckout(buttonId) {
+                const product = PRODUCTS[buttonId] || PRODUCTS[String(buttonId)];
+                if (!product) return;
+        
+                currentButtonId = buttonId;
+                currentAccessUrl = product.accessUrl || '';
+        
+                resetCheckoutSteps();
+                renderProductBadge(product);
+        
+                const title = product.nome.toUpperCase();
+                const priceLabel = 'R$ ' + product.valorFmt;
+        
+                document.getElementById('checkoutButtonId').value = buttonId;
+                document.getElementById('checkoutProductTitle').textContent = title;
+                document.getElementById('checkoutOfferCash').textContent = priceLabel + ' à vista';
+                document.getElementById('checkoutReceiptName').textContent = title;
+                document.getElementById('checkoutReceiptPrice').textContent = priceLabel;
+                document.getElementById('checkoutReceiptTotal').textContent = priceLabel + ' à vista';
+                document.getElementById('pixAmountDisplay').textContent = priceLabel;
+        
+                document.title = product.nome + ' — Checkout';
+                landingView.classList.add('hidden');
+                checkoutView.classList.add('active');
+                document.body.classList.add('checkout-mode');
+                startCountdown();
+                window.scrollTo(0, 0);
+            }
+        
+            window.openCheckout = openCheckout;
+        
+            document.querySelectorAll('.btn-product-checkout').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    const id = parseInt(this.getAttribute('data-button-id'), 10);
+                    if (id > 0) openCheckout(id);
+                });
+            });
+        
+            if (AUTO_CHECKOUT_ID > 0 && (PRODUCTS[AUTO_CHECKOUT_ID] || PRODUCTS[String(AUTO_CHECKOUT_ID)])) {
+                openCheckout(AUTO_CHECKOUT_ID);
+            }
+        
+            function showSuggestions() {
+                const val = emailInput.value.trim();
+                const at = val.indexOf('@');
+                const local = at >= 0 ? val.slice(0, at) : val;
+                if (!local) {
+                    emailSuggestions.classList.remove('open');
+                    return;
+                }
+                emailSuggestions.innerHTML = '';
+                domains.forEach(function (d, i) {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.textContent = local + '@' + d;
+                    if (i === 0) btn.classList.add('active');
+                    btn.addEventListener('click', function () {
+                        emailInput.value = local + '@' + d;
+                        emailSuggestions.classList.remove('open');
+                        emailHint.classList.add('visible');
+                        emailInput.focus();
+                    });
+                    emailSuggestions.appendChild(btn);
+                });
+                emailSuggestions.classList.add('open');
+            }
+        
+            emailInput.addEventListener('input', function () {
+                const v = this.value.trim();
+                if (v && !v.includes('@')) {
+                    showSuggestions();
+                } else {
+                    emailSuggestions.classList.remove('open');
+                }
+                if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) {
+                    emailHint.classList.add('visible');
+                }
+            });
+        
+            emailInput.addEventListener('focus', function () {
+                if (this.value.trim() && !this.value.includes('@')) showSuggestions();
+            });
+        
+            document.addEventListener('click', function (e) {
+                if (!emailSuggestions.contains(e.target) && e.target !== emailInput) {
+                    emailSuggestions.classList.remove('open');
+                }
+            });
+        
+            function setLoading(on) {
+                btnGerarPix.disabled = on;
+                btnGerarPix.classList.toggle('loading', on);
+                btnLabel.textContent = on ? 'Processando...' : 'Gerar Pix';
+            }
+        
+            function showError(msg) {
+                formError.textContent = msg;
+                formError.classList.add('visible');
+            }
+        
+            function hideError() {
+                formError.classList.remove('visible');
+            }
+        
+            function startExpiryCountdown() {
+                expiryRemaining = PIX_EXPIRY_SEC;
+                const progress = document.getElementById('qrProgress');
+                if (expiryTimer) clearInterval(expiryTimer);
+                expiryTimer = setInterval(function () {
+                    expiryRemaining--;
+                    const m = Math.floor(expiryRemaining / 60);
+                    const s = expiryRemaining % 60;
+                    document.getElementById('pixExpires').textContent =
+                        'Expira em ' + pad(m) + ':' + pad(s);
+                    progress.style.transform = 'scaleX(' + (expiryRemaining / PIX_EXPIRY_SEC) + ')';
+                    if (expiryRemaining <= 0) clearInterval(expiryTimer);
+                }, 1000);
+            }
+        
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                hideError();
+        
+                let email = emailInput.value.trim();
+                if (!email.includes('@') && email) {
+                    email = email + '@gmail.com';
+                    emailInput.value = email;
+                }
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                    showError('Informe um e-mail válido.');
+                    return;
+                }
+        
+                currentPayerEmail = email;
+
+                setLoading(true);
+                const fd = new FormData();
+                fd.append('button_id', currentButtonId);
+                fd.append('payer_email', email);
+        
+                fetch('LOJA/create-transaction.php', { method: 'POST', body: fd })
+                    .then(function (r) { return r.json(); })
+                    .then(function (data) {
+                        setLoading(false);
+                        if (!data.success) {
+                            showError(data.error || 'Erro ao gerar PIX.');
+                            return;
+                        }
+        
+                        currentTxId = data.myTransactionId || null;
+                        copyPasteCode = data.copyPaste || '';
+        
+                        const amt = parseFloat(data.amount) || 0;
+                        document.getElementById('pixAmountDisplay').textContent =
+                            'R$ ' + amt.toFixed(2).replace('.', ',');
+        
+                        const qr = data.qrCodeBase64 || '';
+                        const img = document.getElementById('pixQrImg');
+                        if (qr) {
+                            img.src = qr;
+                            img.style.display = 'block';
+                        } else {
+                            img.style.display = 'none';
+                        }
+        
+                        stepCheckout.classList.add('hidden');
+                        stepPix.classList.add('active');
+                        startExpiryCountdown();
+                        startStatusPolling();
+                    })
+                    .catch(function () {
+                        setLoading(false);
+                        showError('Erro de conexão. Tente novamente.');
+                    });
+            });
+        
+            document.getElementById('btnCopyPix').addEventListener('click', function () {
+                if (!copyPasteCode) return;
+                navigator.clipboard.writeText(copyPasteCode).then(function () {
+                    const btn = document.getElementById('btnCopyPix');
+                    btn.textContent = 'Copiado!';
+                    btn.classList.add('copied');
+                    setTimeout(function () {
+                        btn.textContent = 'Copiar código pix';
+                        btn.classList.remove('copied');
+                    }, 2500);
+                });
+            });
+        
+            function startStatusPolling() {
+                if (!currentTxId) return;
+                if (statusInterval) clearInterval(statusInterval);
+                const check = function () {
+                    fetch('LOJA/check-transaction.php?tx=' + encodeURIComponent(currentTxId))
+                        .then(function (r) { return r.json(); })
+                        .then(function (data) {
+                            if (data.success && String(data.status).toUpperCase() === 'COMPLETO') {
+                                clearInterval(statusInterval);
+                                showSuccess();
+                            }
+                        })
+                        .catch(function () {});
+                };
+                check();
+                statusInterval = setInterval(check, 7000);
+            }
+        
+            function showSuccess() {
+                stepPix.classList.remove('active');
+                stepSuccess.classList.add('active');
+
+                if (AUTO_LOGIN && currentPayerEmail && typeof getFingerprint === 'function') {
+                    var sc = document.querySelector('#stepSuccess .success-card');
+                    if (sc) {
+                        sc.innerHTML =
+                            '<h2 style="color:#059669;margin-bottom:12px">✅ Pagamento confirmado!</h2>' +
+                            '<p style="color:#64748b;font-size:14px;margin-bottom:20px">Aguarde, estamos acessando seu painel...</p>' +
+                            '<p style="font-size:32px;text-align:center;animation:spin 1s linear infinite">⏳</p>';
+                    }
+                    getFingerprint().then(function (fp) {
+                        var f   = document.createElement('form');
+                        f.method = 'POST';
+                        f.action = LOGIN_ACTION;
+
+                        var k = document.createElement('input');
+                        k.type = 'hidden'; k.name = 'key'; k.value = currentPayerEmail;
+
+                        var fi = document.createElement('input');
+                        fi.type = 'hidden'; fi.name = 'fingerprint'; fi.value = fp;
+
+                        f.appendChild(k);
+                        f.appendChild(fi);
+                        document.body.appendChild(f);
+                        f.submit();
+                    }).catch(function () {
+                        var link = document.getElementById('btnAccess');
+                        if (currentAccessUrl) { link.href = currentAccessUrl; link.style.display = ''; }
+                        else { link.style.display = 'none'; }
+                    });
+                    return;
+                }
+
+                const link = document.getElementById('btnAccess');
+                if (currentAccessUrl) {
+                    link.href = currentAccessUrl;
+                    link.style.display = '';
+                } else {
+                    link.style.display = 'none';
+                }
+            }
+        })();
+        </script>
+        </div>
+    </div>
+
+        <script src="assets/js/support-widget.js?v=1.4"></script>
+    <script src="assets/js/sw-update.js?v=5.0"></script>
+    <script src="assets/js/icons.js?v=4.0"></script>
+    <script src="assets/js/fingerprint.js?v=5.0"></script>
+    <script src="assets/js/pwa-install.js?v=5.0"></script>
+    <script>
+        document.getElementById('login-icon').innerHTML = Icons.aimbot;
+        if (document.querySelector('.link-icon')) {
+            document.querySelector('.link-icon').innerHTML = Icons.lock;
+        }
+        const tiktokIcon = document.getElementById('tiktok-icon');
+        if (tiktokIcon && Icons.tiktok) {
+            tiktokIcon.innerHTML = Icons.tiktok;
+        }
+        
+        // Gerar fingerprint antes de enviar formulário
+        const loginForm = document.getElementById('login-form');
+        const fingerprintInput = document.getElementById('device-fingerprint');
+        const submitBtn = document.getElementById('submit-btn');
+        
+        if (loginForm && fingerprintInput) {
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'GERANDO IDENTIFICAÇÃO...';
+                }
+                
+                try {
+                    if (typeof getFingerprint !== 'function') {
+                        throw new Error('Função getFingerprint não está disponível. Recarregue a página.');
+                    }
+                    
+                    const fingerprint = await getFingerprint();
+                    
+                    if (!fingerprint || fingerprint.length !== 64) {
+                        throw new Error('Fingerprint inválido gerado');
+                    }
+                    
+                    fingerprintInput.value = fingerprint;
+                    
+                    loginForm.submit();
+                    
+                } catch (error) {
+                    console.error('Erro ao gerar fingerprint:', error);
+                    alert('⚠️ Erro ao identificar dispositivo. Por favor, recarregue a página e tente novamente.\n\nErro: ' + error.message);
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'VALIDAR ACESSO';
+                    }
+                }
+            });
+        }
+    </script>
+    <script>
+        // ===== STORE MODAL =====
+        (function () {
+            var modal   = document.getElementById('storeModal');
+            var bg      = document.getElementById('storeModalBg');
+            var closeBtn = document.getElementById('storeCloseBtn');
+
+            function openStoreModal() {
+                modal.classList.add('open');
+                modal.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+                modal.scrollTop = 0;
+                var pwaBanner = document.getElementById('pwa-install-banner');
+                if (pwaBanner) pwaBanner.style.setProperty('display', 'none', 'important');
+            }
+
+            function closeStoreModal() {
+                modal.classList.remove('open');
+                modal.setAttribute('aria-hidden', 'true');
+                document.body.style.overflow = '';
+                document.body.classList.remove('checkout-mode');
+
+                var lv = document.getElementById('landingView');
+                var cv = document.getElementById('checkoutView');
+                if (lv) lv.classList.remove('hidden');
+                if (cv) cv.classList.remove('active');
+            }
+
+            window.openStoreModal  = openStoreModal;
+            window.closeStoreModal = closeStoreModal;
+
+            if (closeBtn) closeBtn.addEventListener('click', closeStoreModal);
+            if (bg) bg.addEventListener('click', closeStoreModal);
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && modal.classList.contains('open')) {
+                    closeStoreModal();
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
